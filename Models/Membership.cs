@@ -1,5 +1,5 @@
-
 using System.ComponentModel.DataAnnotations.Schema;
+using Juntos.Data.Enum;
 
 namespace Juntos.Models
 {
@@ -15,7 +15,7 @@ namespace Juntos.Models
 
         public double? Price { get; set; }
 
-        public int BillingOption { get; set; }
+        public RepeatOptions BillingOption { get; set; }
 
         public DateTime CreatedAt { get; set; }
 

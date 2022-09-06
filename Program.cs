@@ -14,6 +14,8 @@ builder.Services.AddSwaggerGen();
 
 // Declare Repositories 
 builder.Services.AddScoped<IClubRepository, ClubRepository>();
+builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
+
 
 // Add DB Context
 builder.Services.AddDbContext<DataContext>(options =>

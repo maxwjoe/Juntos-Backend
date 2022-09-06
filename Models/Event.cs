@@ -1,6 +1,7 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Juntos.Data.Enum;
 
 namespace Juntos.Models
 {
@@ -22,7 +23,7 @@ namespace Juntos.Models
 
         public bool DoesRepeat { get; set; }
 
-        public int RepeatOption { get; set; }
+        public RepeatOptions RepeatOption { get; set; }
 
         public DateTime EventDateAndTime { get; set; }
 
