@@ -14,6 +14,8 @@ namespace Juntos.Data
         public DbSet<Club> Clubs => Set<Club>();
         public DbSet<Membership> Memberships => Set<Membership>();
         public DbSet<Event> Events => Set<Event>();
+        public DbSet<Booking> Bookings => Set<Booking>();
+
 
     }
 }

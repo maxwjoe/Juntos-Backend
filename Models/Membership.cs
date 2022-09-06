@@ -1,5 +1,4 @@
 
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Juntos.Models
@@ -26,11 +25,8 @@ namespace Juntos.Models
 
         // --- Relationships ---
 
-        public Club associatedClub { get; set; }
-
-        public ICollection<User> associatedUsers { get; set; }
-
-
+        [ForeignKey("Club")]
+        public int AssociatedClub { get; set; }
 
     }
 }

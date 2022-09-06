@@ -1,12 +1,10 @@
-
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Juntos.Models
 {
     public class User
     {
-        // --- Object Details ---
+        // --- Intrinsic Properties ---
 
         public int Id { get; set; }
 
@@ -15,6 +13,7 @@ namespace Juntos.Models
         public string Email { get; set; }
 
         public string Phone { get; set; }
+        public string Description { get; set; }
 
         public string UserRole { get; set; }
 
@@ -30,10 +29,10 @@ namespace Juntos.Models
 
         // --- Relationships ---
 
-        public Club associatedClub { get; set; }
+        [ForeignKey("Club")]
+        public int AssociatedClubId { get; set; }
 
-        public Membership userMembership { get; set; }
-
-
+        [ForeignKey("Membership")]
+        public int AssociatedMembershipId { get; set; }
     }
 }
