@@ -26,34 +26,26 @@ namespace Juntos.Repositories
         }
         public async Task<Event> Update(Event eventObj, EventDto updates)
         {
-            eventObj.OwnerId = updates.OwnerId;
-            eventObj.ClubId = updates.ClubId;
-            eventObj.CapacityLimit = updates.CapacityLimit;
-            eventObj.BookingTimeLimit = updates.BookingTimeLimit;
-            eventObj.RepeatOption = updates.RepeatOption;
             eventObj.Title = updates.Title;
             eventObj.Description = updates.Description;
-            eventObj.Location = updates.Location;
             eventObj.EventImageUrl = updates.EventImageUrl;
-            eventObj.EventDateAndTime = updates.EventDateAndTime;
+            eventObj.OwnerId = updates.OwnerId;
             eventObj.UpdatedAt = DateTime.Now;
 
             await Save();
             return eventObj;
         }
 
-        public async Task<Event> Delete(int eventObjId)
+        public async Task<Event> Delete(Event eventObj)
         {
-            Event eventObjToDelete = await GetByIdAsync(eventObjId);
-
-            if (eventObjToDelete == null)
+            if (eventObj == null)
             {
                 return new Event();
             }
 
-            _context.Events.Remove(eventObjToDelete);
+            _context.Events.Remove(eventObj);
             await Save();
-            return eventObjToDelete;
+            return eventObj;
         }
 
         public async Task<bool> Save()
@@ -62,13 +54,14 @@ namespace Juntos.Repositories
             return saved > 0;
         }
 
-        public async Task<List<Event>> GetAll()
+        public async Task<List<Event>> GetAll(int userId)
         {
-            return await _context.Events.ToListAsync();
+            return await _context.Events.Where(i => i.OwnerId == userId).ToListAsync();
         }
 
         public async Task<Event> GetByIdAsync(int eventObjId)
         {
+
             return await _context.Events.FindAsync(eventObjId);
         }
 

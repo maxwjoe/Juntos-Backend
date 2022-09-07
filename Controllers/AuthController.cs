@@ -1,5 +1,6 @@
 using Juntos.Interfaces;
 using Juntos.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Juntos.Controllers
@@ -18,13 +19,13 @@ namespace Juntos.Controllers
             _authService = authService;
         }
 
-
+        //TODO: Delete this route
         // GetAllUsers : Gets all the users in the database
         [HttpGet]
+        [Authorize(Roles = "Developer")]
         public async Task<ActionResult<List<User>>> GetAllUsers()
         {
             var usersDb = await _userRepository.GetAll();
-
 
             if (usersDb == null)
             {
@@ -66,22 +67,18 @@ namespace Juntos.Controllers
             return BadRequest(response.Message);
         }
 
-
+        //TODO: Beyond MVP -> Make sure only admin from a certain club can modify user
         // UpdateExistingUser : Updates an existing user in Db
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("{userId}")]
         public async Task<ActionResult<User>> UpdatedExistingUser([FromBody] UserDto updates, [FromRoute] int userId)
         {
             User existingUser = await _userRepository.GetByIdAsync(userId);
 
-            if (updates == null)
+            if (existingUser == null || updates == null)
             {
-                return Ok(existingUser);
-            }
-
-            if (existingUser == null)
-            {
-                return BadRequest("User does not exist");
+                return BadRequest("Could not modify user");
             }
 
             User updatedUser = await _userRepository.Update(existingUser, updates);
@@ -92,6 +89,7 @@ namespace Juntos.Controllers
 
         // DeleteExistingUser : Deletes an existing user from Db
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("{userId}")]
         public async Task<ActionResult<User>> DeleteExistingUser([FromRoute] int userId)
         {

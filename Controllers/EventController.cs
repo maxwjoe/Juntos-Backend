@@ -1,5 +1,7 @@
+using System.Security.Claims;
 using Juntos.Interfaces;
 using Juntos.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Juntos.Controllers
@@ -9,30 +11,41 @@ namespace Juntos.Controllers
     public class EventController : ControllerBase
     {
 
-        private readonly IEventRepository _eventobjRepository;
-        public EventController(IEventRepository eventobjRepository)
+        private readonly IEventRepository _eventObjRepository;
+        private readonly IAuthService _authService;
+        public EventController(IEventRepository eventObjRepository, IAuthService authService)
         {
-            _eventobjRepository = eventobjRepository;
+            _eventObjRepository = eventObjRepository;
+            _authService = authService;
         }
 
-
-        // GetAllEvents : Gets all the eventobjs in the database
+        //TODO: Make this find relative to a club not a user
+        // GetAllEvents : Gets all the eventObjs in the database belonging to user
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Event>>> GetAllEvents()
         {
-            var eventobjsDb = await _eventobjRepository.GetAll();
+            User reqUser = await _authService.GetUserObjFromToken();
 
-            if (eventobjsDb == null)
+            if (reqUser == null)
             {
-                return BadRequest("Could not get eventobjs");
+                return Unauthorized("You do not have the correct credentials");
             }
 
-            return Ok(eventobjsDb);
+            var eventObjsDb = await _eventObjRepository.GetAll(reqUser.Id);
+
+            if (eventObjsDb == null)
+            {
+                return BadRequest("Could not get eventObjs");
+            }
+
+            return Ok(eventObjsDb);
         }
 
 
-        // CreateNewEvent : Creates a new eventobj in the database
+        // CreateNewEvent : Creates a new eventObj in the database
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Event>> CreateNewEvent(EventDto request)
         {
             if (request == null)
@@ -40,55 +53,72 @@ namespace Juntos.Controllers
                 return BadRequest("Invalid Event");
             }
 
+            User reqUser = await _authService.GetUserObjFromToken();
+
+            if (reqUser == null)
+            {
+                return Unauthorized("You do not have the correct credentials");
+            }
+
             Event newEvent = new Event
             {
-                OwnerId = request.OwnerId,
-                ClubId = request.ClubId,
-                CapacityLimit = request.CapacityLimit,
-                BookingTimeLimit = request.BookingTimeLimit,
-                RepeatOption = request.RepeatOption,
+                OwnerId = reqUser.Id,
                 Title = request.Title,
                 Description = request.Description,
-                Location = request.Location,
                 EventImageUrl = request.EventImageUrl,
-                EventDateAndTime = request.EventDateAndTime
             };
 
-            Event createdEvent = await _eventobjRepository.Create(newEvent);
+            Event createdEvent = await _eventObjRepository.Create(newEvent);
 
             return Ok(createdEvent);
         }
 
 
-        // UpdateExistingEvent : Updates an existing eventobj in Db
+        // UpdateExistingEvent : Updates an existing eventObj in Db
         [HttpPut]
-        [Route("{eventobjId}")]
-        public async Task<ActionResult<Event>> UpdatedExistingEvent([FromBody] EventDto updates, [FromRoute] int eventobjId)
+        [Authorize(Roles = "Admin")]
+        [Route("{eventObjId}")]
+        public async Task<ActionResult<Event>> UpdatedExistingEvent([FromBody] EventDto updates, [FromRoute] int eventObjId)
         {
-            Event existingEvent = await _eventobjRepository.GetByIdAsync(eventobjId);
+            Event existingEvent = await _eventObjRepository.GetByIdAsync(eventObjId);
+            User reqUser = await _authService.GetUserObjFromToken();
 
-            if (updates == null)
+            if (existingEvent == null || reqUser == null || updates == null)
             {
-                return Ok(existingEvent);
+                return BadRequest("Invalid Params");
             }
 
-            if (existingEvent == null)
+            if (existingEvent.OwnerId != reqUser.Id)
             {
-                return BadRequest("Event does not exist");
+                return Unauthorized("You do not own this eventObj");
             }
 
-            Event updatedEvent = await _eventobjRepository.Update(existingEvent, updates);
+            Event updatedEvent = await _eventObjRepository.Update(existingEvent, updates);
 
             return Ok(updatedEvent);
         }
 
 
-        // DeleteExistingEvent : Deletes an existing eventobj from Db
+        // DeleteExistingEvent : Deletes an existing eventObj from Db
         [HttpDelete]
-        [Route("{eventobjId}")]
-        public async Task<ActionResult<Event>> DeleteExistingEvent([FromRoute] int eventobjId)
+        [Authorize(Roles = "Admin")]
+        [Route("{eventObjId}")]
+        public async Task<ActionResult<Event>> DeleteExistingEvent([FromRoute] int eventObjId)
         {
-            Event deletedEvent = await _eventobjRepository.Delete(eventobjId);
+            User curUser = await _authService.GetUserObjFromToken();
+            Event eventObjToDelete = await _eventObjRepository.GetByIdAsync(eventObjId);
+
+            if (curUser == null || eventObjToDelete == null)
+            {
+                return BadRequest("Failed to delete eventObj");
+            }
+
+            if (curUser.Id != eventObjToDelete.OwnerId)
+            {
+                return Unauthorized("You do not own this eventObj");
+            }
+
+            Event deletedEvent = await _eventObjRepository.Delete(eventObjToDelete);
             return Ok(deletedEvent);
         }
 
