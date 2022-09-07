@@ -36,18 +36,16 @@ namespace Juntos.Repositories
             return club;
         }
 
-        public async Task<Club> Delete(int clubId)
+        public async Task<Club> Delete(Club club)
         {
-            Club clubToDelete = await GetByIdAsync(clubId);
-
-            if (clubToDelete == null)
+            if (club == null)
             {
                 return new Club();
             }
 
-            _context.Clubs.Remove(clubToDelete);
+            _context.Clubs.Remove(club);
             await Save();
-            return clubToDelete;
+            return club;
         }
 
         public async Task<bool> Save()
@@ -56,13 +54,14 @@ namespace Juntos.Repositories
             return saved > 0;
         }
 
-        public async Task<List<Club>> GetAll()
+        public async Task<List<Club>> GetAll(int userId)
         {
-            return await _context.Clubs.ToListAsync();
+            return await _context.Clubs.Where(i => i.OwnerId == userId).ToListAsync();
         }
 
         public async Task<Club> GetByIdAsync(int clubId)
         {
+
             return await _context.Clubs.FindAsync(clubId);
         }
 

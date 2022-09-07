@@ -20,12 +20,19 @@ namespace Juntos.Controllers
         }
 
 
-        // GetAllClubs : Gets all the clubs in the database
+        // GetAllClubs : Gets all the clubs in the database belonging to user
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Club>>> GetAllClubs()
         {
-            var clubsDb = await _clubRepository.GetAll();
+            User reqUser = await _authService.GetUserObjFromToken();
+
+            if (reqUser == null)
+            {
+                return Unauthorized("You do not have the correct credentials");
+            }
+
+            var clubsDb = await _clubRepository.GetAll(reqUser.Id);
 
             if (clubsDb == null)
             {
@@ -35,20 +42,10 @@ namespace Juntos.Controllers
             return Ok(clubsDb);
         }
 
-        //testAuth
-        [HttpGet]
-        [Route("test")]
-        [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<User>> TestAuth()
-        {
-            User user = await _authService.GetUserObjFromToken();
-
-            return Ok(user);
-        }
-
 
         // CreateNewClub : Creates a new club in the database
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Club>> CreateNewClub(ClubDto request)
         {
             if (request == null)
@@ -56,9 +53,16 @@ namespace Juntos.Controllers
                 return BadRequest("Invalid Club");
             }
 
+            User reqUser = await _authService.GetUserObjFromToken();
+
+            if (reqUser == null)
+            {
+                return Unauthorized("You do not have the correct credentials");
+            }
+
             Club newClub = new Club
             {
-                OwnerId = request.OwnerId,
+                OwnerId = reqUser.Id,
                 Title = request.Title,
                 Description = request.Description,
                 ClubImageUrl = request.ClubImageUrl,
@@ -72,19 +76,21 @@ namespace Juntos.Controllers
 
         // UpdateExistingClub : Updates an existing club in Db
         [HttpPut]
+        [Authorize(Roles = "Admin")]
         [Route("{clubId}")]
         public async Task<ActionResult<Club>> UpdatedExistingClub([FromBody] ClubDto updates, [FromRoute] int clubId)
         {
             Club existingClub = await _clubRepository.GetByIdAsync(clubId);
+            User reqUser = await _authService.GetUserObjFromToken();
 
-            if (updates == null)
+            if (existingClub == null || reqUser == null || updates == null)
             {
-                return Ok(existingClub);
+                return BadRequest("Invalid Params");
             }
 
-            if (existingClub == null)
+            if (existingClub.OwnerId != reqUser.Id)
             {
-                return BadRequest("Club does not exist");
+                return Unauthorized("You do not own this club");
             }
 
             Club updatedClub = await _clubRepository.Update(existingClub, updates);
@@ -95,10 +101,24 @@ namespace Juntos.Controllers
 
         // DeleteExistingClub : Deletes an existing club from Db
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         [Route("{clubId}")]
         public async Task<ActionResult<Club>> DeleteExistingClub([FromRoute] int clubId)
         {
-            Club deletedClub = await _clubRepository.Delete(clubId);
+            User curUser = await _authService.GetUserObjFromToken();
+            Club clubToDelete = await _clubRepository.GetByIdAsync(clubId);
+
+            if (curUser == null || clubToDelete == null)
+            {
+                return BadRequest("Failed to delete club");
+            }
+
+            if (curUser.Id != clubToDelete.OwnerId)
+            {
+                return Unauthorized("You do not own this club");
+            }
+
+            Club deletedClub = await _clubRepository.Delete(clubToDelete);
             return Ok(deletedClub);
         }
 
