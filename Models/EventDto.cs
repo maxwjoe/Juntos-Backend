@@ -6,7 +6,6 @@ namespace Juntos.Models
     {
         public int OwnerId { get; set; }
         public int AssociatedClub { get; set; }
-        public int[] AllowedMembershipIds { get; set; }
         public string Title { get; set; }
         public string Description { get; set; }
         public string Location { get; set; }
@@ -15,5 +14,6 @@ namespace Juntos.Models
         public int BookingTimeLimitMinutes { get; set; }
         public RepeatOptions RepeatOption { get; set; }
         public DateTime EventDateAndTime { get; set; }
+        public ICollection<MembershipRef> AllowedMembershipRefs { get; set; }
     }
 }

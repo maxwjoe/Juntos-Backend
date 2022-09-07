@@ -76,6 +76,24 @@ namespace Juntos.Repositories
             return await _context.Memberships.FirstOrDefaultAsync(i => i.Id == id);
         }
 
+        // CheckExists : Checks that all memberships in an array of Ids exist in Db
+        public async Task<bool> CheckExists(MembershipRef[] refs)
+        {
+            if (refs == null || refs.Length == 0)
+            {
+                return false;
+            }
+            for (int i = 0; i < refs.Length; i++)
+            {
+                bool found = await _context.Memberships.AnyAsync(m => m.Id == refs[i].ReferencedMembershipId);
+                if (!found)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
         // GetByOwnerAsync : Gets Clubs from Owner Id
         public async Task<List<Membership>> GetByClubAsync(int associatedClubId)
         {

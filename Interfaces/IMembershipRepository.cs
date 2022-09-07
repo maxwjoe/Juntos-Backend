@@ -17,6 +17,7 @@ namespace Juntos.Interfaces
 
         Task<IEnumerable<Membership>> GetAll();
         Task<Membership> GetByIdAsync(int id);
+        Task<bool> CheckExists(MembershipRef[] refs);
         Task<List<Membership>> GetByClubAsync(int associatedClubId);
 
 

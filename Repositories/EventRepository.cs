@@ -10,9 +10,11 @@ namespace Juntos.Repositories
     {
 
         private readonly DataContext _context;
-        public EventRepository(DataContext context)
+        private readonly IMembershipRepository _membershipRepository;
+        public EventRepository(DataContext context, IMembershipRepository membershipRepository)
         {
             _context = context;
+            _membershipRepository = membershipRepository;
         }
 
 
@@ -20,6 +22,17 @@ namespace Juntos.Repositories
 
         public async Task<Event> Add(Event eventObj)
         {
+            // Check that all memberships on event are valid
+            MembershipRef[] membershipRefs = eventObj.AllowedMembershipRefs.ToArray();
+            bool validMemberships = await _membershipRepository.CheckExists(membershipRefs);
+
+            // Return an empty event if not valid
+            if (!validMemberships)
+            {
+                return new Event();
+            }
+
+            // Save valid event to db
             await _context.Events.AddAsync(eventObj);
             await Save();
             return eventObj;
@@ -28,6 +41,17 @@ namespace Juntos.Repositories
         //TODO: Allow Event Memberships update (Need to inject membership repository idk?)
         public async Task<Event> Update(Event eventObj, EventDto updates)
         {
+
+            // Check that all memberships on event are valid
+            MembershipRef[] membershipRefs = updates.AllowedMembershipRefs.ToArray();
+            bool validMemberships = await _membershipRepository.CheckExists(membershipRefs);
+
+            // Return an empty event if not valid
+            if (!validMemberships)
+            {
+                return new Event();
+            }
+
             eventObj.Title = updates.Title;
             eventObj.Description = updates.Description;
             eventObj.AssociatedClub = updates.AssociatedClub;
@@ -38,11 +62,14 @@ namespace Juntos.Repositories
             eventObj.BookingTimeLimitMinutes = updates.BookingTimeLimitMinutes;
             eventObj.RepeatOption = updates.RepeatOption;
             eventObj.EventDateAndTime = updates.EventDateAndTime;
+            eventObj.AllowedMembershipRefs = updates.AllowedMembershipRefs;
             eventObj.UpdatedAt = DateTime.Now;
 
             await Save();
             return eventObj;
         }
+
+
         public async Task<Event> Delete(int Id)
         {
             Event tgtEvent = await _context.Events.FindAsync(Id);
@@ -69,7 +96,7 @@ namespace Juntos.Repositories
 
         public async Task<IEnumerable<Event>> GetAll()
         {
-            return await _context.Events.ToListAsync();
+            return await _context.Events.Include(i => i.AllowedMembershipRefs).ToListAsync();
         }
         public async Task<Event> GetByIdAsync(int id)
         {

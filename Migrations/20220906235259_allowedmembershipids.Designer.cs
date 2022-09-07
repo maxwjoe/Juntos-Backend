@@ -4,6 +4,7 @@ using Juntos.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Juntos_Backend.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220906235259_allowedmembershipids")]
+    partial class allowedmembershipids
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -183,9 +185,6 @@ namespace Juntos_Backend.Migrations
                     b.Property<int?>("EventId")
                         .HasColumnType("int");
 
-                    b.Property<int>("ReferencedMembershipId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("EventId");
@@ -253,13 +252,13 @@ namespace Juntos_Backend.Migrations
             modelBuilder.Entity("Juntos.Models.MembershipRef", b =>
                 {
                     b.HasOne("Juntos.Models.Event", null)
-                        .WithMany("AllowedMembershipRefs")
+                        .WithMany("AllowedMembershipIds")
                         .HasForeignKey("EventId");
                 });
 
             modelBuilder.Entity("Juntos.Models.Event", b =>
                 {
-                    b.Navigation("AllowedMembershipRefs");
+                    b.Navigation("AllowedMembershipIds");
                 });
 #pragma warning restore 612, 618
         }

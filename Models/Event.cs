@@ -42,7 +42,7 @@ namespace Juntos.Models
         [ForeignKey("Club")]
         public int AssociatedClub { get; set; }
 
-        public ICollection<Membership> AllowedMemberships { get; set; }
+        public ICollection<MembershipRef> AllowedMembershipRefs { get; set; }
 
 
     }
