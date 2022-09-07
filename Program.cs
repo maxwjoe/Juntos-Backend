@@ -14,8 +14,9 @@ builder.Services.AddSwaggerGen();
 
 // Declare Repositories 
 builder.Services.AddScoped<IClubRepository, ClubRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IEventRepository, EventRepository>();
 // builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
-// builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 
 
