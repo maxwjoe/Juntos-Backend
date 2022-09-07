@@ -9,7 +9,6 @@ namespace Juntos.Controllers
     [ApiController]
     public class UserController : ControllerBase
     {
-
         private readonly IUserRepository _userRepository;
         private readonly IAuthService _authService;
 
@@ -19,13 +18,13 @@ namespace Juntos.Controllers
             _authService = authService;
         }
 
-        //TODO: Delete this route
-        // GetAllUsers : Gets all the users in the database
+        // GetAllUsers : Gets all the users in the database related to a club
         [HttpGet]
-        [Authorize(Roles = "Developer")]
-        public async Task<ActionResult<List<User>>> GetAllUsers()
+        [Route("{clubId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<List<User>>> GetAllUsers([FromRoute] int clubId)
         {
-            var usersDb = await _userRepository.GetAll();
+            var usersDb = await _userRepository.GetAll(clubId);
 
             if (usersDb == null)
             {
@@ -39,7 +38,7 @@ namespace Juntos.Controllers
         // Register : Creates a new user in the database
         [HttpPost]
         [Route("register")]
-        public async Task<ActionResult<User>> Register(UserDto request)
+        public async Task<ActionResult<AuthResponseDto>> Register(UserDto request)
         {
 
             if (request == null)
@@ -47,32 +46,31 @@ namespace Juntos.Controllers
                 return BadRequest("Invalid User Parameters");
             }
 
-            User createdUser = await _authService.RegisterUser(request);
+            AuthResponseDto registerResult = await _authService.RegisterUser(request);
 
-            return Ok(createdUser);
+            return Ok(registerResult);
         }
 
         // Login : Logs a user in
         [HttpPost]
         [Route("login")]
-        public async Task<ActionResult<User>> Login(UserDto request)
+        public async Task<ActionResult<AuthResponseDto>> Login(UserDto request)
         {
-            var response = await _authService.Login(request);
-
-            if (response.Success)
+            if (request == null)
             {
-                return Ok(response);
+                return BadRequest("Invalid User Parameters");
             }
 
-            return BadRequest(response.Message);
+            AuthResponseDto loginResult = await _authService.Login(request);
+            return loginResult;
         }
 
-        //TODO: Beyond MVP -> Make sure only admin from a certain club can modify user
+
         // UpdateExistingUser : Updates an existing user in Db
         [HttpPut]
         [Authorize(Roles = "Admin")]
         [Route("{userId}")]
-        public async Task<ActionResult<User>> UpdatedExistingUser([FromBody] UserDto updates, [FromRoute] int userId)
+        public async Task<ActionResult<User>> UpdateExistingUser([FromBody] UserDto updates, [FromRoute] int userId)
         {
             User existingUser = await _userRepository.GetByIdAsync(userId);
 
@@ -96,8 +94,6 @@ namespace Juntos.Controllers
             User deletedUser = await _userRepository.Delete(userId);
             return Ok(deletedUser);
         }
-
-
 
     }
 }

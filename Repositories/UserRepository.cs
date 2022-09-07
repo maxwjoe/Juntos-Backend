@@ -30,6 +30,7 @@ namespace Juntos.Repositories
             user.Email = updates.Email;
             user.Phone = updates.Phone;
             user.ProfileImageUrl = updates.ProfileImageUrl;
+            user.MembershipId = updates.MembershipId;
             user.UpdatedAt = DateTime.Now;
 
             await Save();
@@ -56,9 +57,9 @@ namespace Juntos.Repositories
             return saved > 0;
         }
 
-        public async Task<List<User>> GetAll()
+        public async Task<List<User>> GetAll(int clubId)
         {
-            return await _context.Users.ToListAsync();
+            return await _context.Users.Where(i => i.ClubId == clubId).ToListAsync();
         }
 
         public async Task<User> GetByIdAsync(int userId)

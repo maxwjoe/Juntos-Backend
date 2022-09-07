@@ -10,7 +10,7 @@ namespace Juntos.Interfaces
         Task<User> GetUserObjFromToken();
         void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
         bool VerifyPasswordHash(User user, string password);
-        Task<User> RegisterUser(UserDto request);
+        Task<AuthResponseDto> RegisterUser(UserDto request);
         Task<AuthResponseDto> Login(UserDto request);
     }
 }

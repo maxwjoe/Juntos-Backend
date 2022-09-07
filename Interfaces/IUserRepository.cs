@@ -15,7 +15,7 @@ namespace Juntos.Interfaces
 
         // --- QUERY METHODS ---
 
-        Task<List<User>> GetAll();
+        Task<List<User>> GetAll(int clubId);
         Task<User> GetByIdAsync(int userId);
         Task<User> GetByEmailAsync(string userEmail);
 

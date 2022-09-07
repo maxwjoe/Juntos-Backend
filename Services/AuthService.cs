@@ -110,7 +110,7 @@ namespace Juntos.Services
         }
 
         // RegisterUser : Handles registering a new user
-        public async Task<User> RegisterUser(UserDto request)
+        public async Task<AuthResponseDto> RegisterUser(UserDto request)
         {
             CreatePasswordHash(request.Password, out byte[] passwordHash, out byte[] passwordSalt);
 
@@ -126,13 +126,21 @@ namespace Juntos.Services
             };
 
             User createdUser = await _userRepository.Create(newUser);
-            return createdUser;
+
+            if (createdUser == null)
+            {
+                return new AuthResponseDto { Message = "Failed to register" };
+            }
+
+            AuthResponseDto result = await Login(request);
+
+            return result;
         }
 
         // Login : Handles logging in
         public async Task<AuthResponseDto> Login(UserDto request)
         {
-            var existingUser = await _userRepository.GetByEmailAsync(request.Email);
+            User existingUser = await _userRepository.GetByEmailAsync(request.Email);
 
             if (existingUser == null)
             {
@@ -146,13 +154,23 @@ namespace Juntos.Services
 
             string token = CreateToken(existingUser);
 
+            UserDto userPayload = new UserDto
+            {
+                ClubId = existingUser.ClubId,
+                MembershipId = existingUser.MembershipId,
+                UserName = existingUser.UserName,
+                Email = existingUser.Email,
+                Phone = existingUser.Phone,
+                Role = existingUser.Role,
+                ProfileImageUrl = existingUser.ProfileImageUrl,
+            };
+
             return new AuthResponseDto
             {
                 Success = true,
                 Token = token,
+                currentUser = userPayload
             };
         }
-
-
     }
 }
