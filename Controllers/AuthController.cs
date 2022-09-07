@@ -25,6 +25,7 @@ namespace Juntos.Controllers
         {
             var usersDb = await _userRepository.GetAll();
 
+
             if (usersDb == null)
             {
                 return BadRequest("Could not get users");

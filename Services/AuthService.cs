@@ -3,6 +3,8 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using Juntos.Interfaces;
 using Juntos.Models;
+using Juntos.Repositories;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.IdentityModel.Tokens;
 
 namespace Juntos.Services
@@ -12,11 +14,49 @@ namespace Juntos.Services
 
         private readonly IConfiguration _configuration;
         private readonly IUserRepository _userRepository;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public AuthService(IConfiguration configuration, IUserRepository userRepository)
+        public AuthService(IConfiguration configuration, IUserRepository userRepository, IHttpContextAccessor httpContextAccesor)
         {
             _configuration = configuration;
             _userRepository = userRepository;
+            _httpContextAccessor = httpContextAccesor;
+        }
+
+        // GetClaimsFromToken : Gets all User claims from token
+        private Claim[] GetClaimsFromToken()
+        {
+            Claim[] claims = _httpContextAccessor.HttpContext.User.Claims.ToArray();
+            return claims;
+        }
+
+        private string GetClaimValueFromType(Claim[] claims, string claimType)
+        {
+            for (int i = 0; i < claims.Length; i++)
+            {
+                if (claims[i].Type == claimType)
+                {
+                    return claims[i].Value;
+                }
+            }
+            return string.Empty;
+        }
+
+        public string GetUserEmailFromToken()
+        {
+            Claim[] claims = GetClaimsFromToken();
+
+            string email = GetClaimValueFromType(claims, ClaimValueTypes.Email);
+            return email;
+        }
+
+        public async Task<User> GetUserObjFromToken()
+        {
+            string email = GetUserEmailFromToken();
+
+            User user = await _userRepository.GetByEmailAsync(email);
+
+            return user;
         }
 
         // CreateToken : Generates a JWT for User
@@ -24,7 +64,6 @@ namespace Juntos.Services
         {
             List<Claim> claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, user.UserName),
                 new Claim(ClaimTypes.Email, user.Email),
                 new Claim(ClaimTypes.Role, user.Role),
             };
@@ -82,6 +121,8 @@ namespace Juntos.Services
                 Phone = request.Phone,
                 Role = request.Role,
                 ProfileImageUrl = request.ProfileImageUrl,
+                PasswordHash = passwordHash,
+                PasswordSalt = passwordSalt
             };
 
             User createdUser = await _userRepository.Create(newUser);

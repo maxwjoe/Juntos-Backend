@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Juntos.Interfaces;
 using Juntos.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -11,15 +12,17 @@ namespace Juntos.Controllers
     {
 
         private readonly IClubRepository _clubRepository;
-        public ClubController(IClubRepository clubRepository)
+        private readonly IAuthService _authService;
+        public ClubController(IClubRepository clubRepository, IAuthService authService)
         {
             _clubRepository = clubRepository;
+            _authService = authService;
         }
 
 
         // GetAllClubs : Gets all the clubs in the database
         [HttpGet]
-        [Authorize]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<List<Club>>> GetAllClubs()
         {
             var clubsDb = await _clubRepository.GetAll();
@@ -30,6 +33,17 @@ namespace Juntos.Controllers
             }
 
             return Ok(clubsDb);
+        }
+
+        //testAuth
+        [HttpGet]
+        [Route("test")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<User>> TestAuth()
+        {
+            User user = await _authService.GetUserObjFromToken();
+
+            return Ok(user);
         }
 
 
