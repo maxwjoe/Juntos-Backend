@@ -17,6 +17,7 @@ namespace Juntos.Interfaces
 
         Task<List<User>> GetAll();
         Task<User> GetByIdAsync(int userId);
+        Task<User> GetByEmailAsync(string userEmail);
 
 
 

@@ -66,6 +66,12 @@ namespace Juntos.Repositories
             return await _context.Users.FindAsync(userId);
         }
 
+        public async Task<User> GetByEmailAsync(string userEmail)
+        {
+            return await _context.Users.FirstOrDefaultAsync(i => i.Email == userEmail);
+        }
+
+
 
 
 

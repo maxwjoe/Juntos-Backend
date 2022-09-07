@@ -10,9 +10,12 @@ namespace Juntos.Controllers
     {
 
         private readonly IUserRepository _userRepository;
-        public UserController(IUserRepository userRepository)
+        private readonly IAuthService _authService;
+
+        public UserController(IUserRepository userRepository, IAuthService authService)
         {
             _userRepository = userRepository;
+            _authService = authService;
         }
 
 
@@ -31,27 +34,35 @@ namespace Juntos.Controllers
         }
 
 
-        // CreateNewUser : Creates a new user in the database
+        // Register : Creates a new user in the database
         [HttpPost]
-        public async Task<ActionResult<User>> CreateNewUser(UserDto request)
+        [Route("register")]
+        public async Task<ActionResult<User>> Register(UserDto request)
         {
+
             if (request == null)
             {
-                return BadRequest("Invalid User");
+                return BadRequest("Invalid User Parameters");
             }
 
-            User newUser = new User
-            {
-                UserName = request.UserName,
-                Email = request.Email,
-                Phone = request.Phone,
-                Role = request.Role,
-                ProfileImageUrl = request.ProfileImageUrl,
-            };
-
-            User createdUser = await _userRepository.Create(newUser);
+            User createdUser = await _authService.RegisterUser(request);
 
             return Ok(createdUser);
+        }
+
+        // Login : Logs a user in
+        [HttpPost]
+        [Route("login")]
+        public async Task<ActionResult<User>> Login(UserDto request)
+        {
+            var response = await _authService.Login(request);
+
+            if (response.Success)
+            {
+                return Ok(response);
+            }
+
+            return BadRequest(response.Message);
         }
 
 

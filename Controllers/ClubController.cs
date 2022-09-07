@@ -1,5 +1,6 @@
 using Juntos.Interfaces;
 using Juntos.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Juntos.Controllers
@@ -18,6 +19,7 @@ namespace Juntos.Controllers
 
         // GetAllClubs : Gets all the clubs in the database
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<List<Club>>> GetAllClubs()
         {
             var clubsDb = await _clubRepository.GetAll();

@@ -59,3 +59,8 @@
 /Users/joelmaxwell/Programming/Repositories/Juntos-Backend/obj/Debug/net6.0/Juntos-Backend.pdb
 /Users/joelmaxwell/Programming/Repositories/Juntos-Backend/obj/Debug/net6.0/Juntos-Backend.genruntimeconfig.cache
 /Users/joelmaxwell/Programming/Repositories/Juntos-Backend/obj/Debug/net6.0/ref/Juntos-Backend.dll
+/Users/joelmaxwell/Programming/Repositories/Juntos-Backend/bin/Debug/net6.0/Microsoft.AspNetCore.Authentication.JwtBearer.dll
+/Users/joelmaxwell/Programming/Repositories/Juntos-Backend/bin/Debug/net6.0/Microsoft.Extensions.DependencyModel.dll
+/Users/joelmaxwell/Programming/Repositories/Juntos-Backend/bin/Debug/net6.0/Scrutor.dll
+/Users/joelmaxwell/Programming/Repositories/Juntos-Backend/bin/Debug/net6.0/Swashbuckle.AspNetCore.Filters.dll
+/Users/joelmaxwell/Programming/Repositories/Juntos-Backend/bin/Debug/net6.0/Swashbuckle.AspNetCore.Filters.Abstractions.dll
