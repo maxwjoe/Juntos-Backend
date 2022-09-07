@@ -13,6 +13,7 @@ namespace Juntos.Models
         public string Description { get; set; }
         public string Location { get; set; }
         public string EventImageUrl { get; set; }
+        public string AllowedMemberships { get; set; }
         public DateTime EventDateAndTime { get; set; }
     }
 }

@@ -4,6 +4,7 @@ namespace Juntos.Models
     {
         public int Id { get; set; }
         public int ClubId { get; set; }
+        public int MembershipId { get; set; }
         public string UserName { get; set; }
         //NOTE: Emails must be unique
         public string Email { get; set; }

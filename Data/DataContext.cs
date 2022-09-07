@@ -13,6 +13,8 @@ namespace Juntos.Data
         public DbSet<User> Users { get; set; }
         public DbSet<Club> Clubs { get; set; }
         public DbSet<Event> Events { get; set; }
+        public DbSet<Membership> Memberships { get; set; }
+        public DbSet<Booking> Bookings { get; set; }
 
     }
 }
