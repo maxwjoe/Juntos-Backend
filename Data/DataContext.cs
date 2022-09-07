@@ -1,3 +1,4 @@
+// using Juntos.Models;
 using Juntos.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,15 +8,11 @@ namespace Juntos.Data
     {
         public DataContext(DbContextOptions<DataContext> options) : base(options)
         {
-
         }
 
-        public DbSet<User> Users => Set<User>();
-        public DbSet<Club> Clubs => Set<Club>();
-        public DbSet<Membership> Memberships => Set<Membership>();
-        public DbSet<Event> Events => Set<Event>();
-        public DbSet<Booking> Bookings => Set<Booking>();
-
+        public DbSet<User> Users { get; set; }
+        public DbSet<Club> Clubs { get; set; }
+        public DbSet<Event> Events { get; set; }
 
     }
 }

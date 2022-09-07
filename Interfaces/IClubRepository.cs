@@ -6,18 +6,18 @@ namespace Juntos.Interfaces
     {
 
         // --- CRUD METHODS ---
-
-        Task<Club> Add(Club club);
+        Task<Club> Create(Club club);
         Task<Club> Update(Club club, ClubDto updates);
-        Task<Club> Delete(int Id);
+        Task<Club> Delete(int clubId);
+
         Task<bool> Save();
 
 
-        // --- COMPLEX METHODS ---
+        // --- QUERY METHODS ---
 
-        Task<IEnumerable<Club>> GetAll();
-        Task<Club> GetByIdAsync(int id);
-        Task<Club> GetByOwnerAsync(int ownerId);
+        Task<List<Club>> GetAll();
+        Task<Club> GetByIdAsync(int clubId);
+
 
 
     }

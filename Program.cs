@@ -14,15 +14,15 @@ builder.Services.AddSwaggerGen();
 
 // Declare Repositories 
 builder.Services.AddScoped<IClubRepository, ClubRepository>();
-builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
-builder.Services.AddScoped<IEventRepository, EventRepository>();
+// builder.Services.AddScoped<IMembershipRepository, MembershipRepository>();
+// builder.Services.AddScoped<IEventRepository, EventRepository>();
 
 
 
 // Add DB Context
 builder.Services.AddDbContext<DataContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("JuntosDbConnectionString"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("JuntosServerDbConnectionString"));
 });
 
 var app = builder.Build();

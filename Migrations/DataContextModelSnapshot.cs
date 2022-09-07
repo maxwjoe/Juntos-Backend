@@ -22,34 +22,6 @@ namespace Juntos_Backend.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("Juntos.Models.Booking", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("isWaitlisted")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Bookings");
-                });
-
             modelBuilder.Entity("Juntos.Models.Club", b =>
                 {
                     b.Property<int>("Id")
@@ -58,7 +30,7 @@ namespace Juntos_Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<string>("ClubImageURL")
+                    b.Property<string>("ClubImageUrl")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -92,13 +64,13 @@ namespace Juntos_Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AssociatedClub")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BookingTimeLimitMinutes")
+                    b.Property<int>("BookingTimeLimit")
                         .HasColumnType("int");
 
                     b.Property<int>("CapacityLimit")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ClubId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
@@ -108,11 +80,12 @@ namespace Juntos_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool>("DoesRepeat")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("EventDateAndTime")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("EventImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -136,63 +109,6 @@ namespace Juntos_Backend.Migrations
                     b.ToTable("Events");
                 });
 
-            modelBuilder.Entity("Juntos.Models.Membership", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int>("AssociatedClub")
-                        .HasColumnType("int");
-
-                    b.Property<int>("BillingOption")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double?>("Price")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Title")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Memberships");
-                });
-
-            modelBuilder.Entity("Juntos.Models.MembershipRef", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("EventId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("ReferencedMembershipId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("EventId");
-
-                    b.ToTable("MembershipRef");
-                });
-
             modelBuilder.Entity("Juntos.Models.User", b =>
                 {
                     b.Property<int>("Id")
@@ -201,36 +117,25 @@ namespace Juntos_Backend.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int>("AssociatedClubId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("AssociatedMembershipId")
+                    b.Property<int>("ClubId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<string>("Email")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<byte[]>("PasswordHash")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<byte[]>("PasswordSalt")
-                        .IsRequired()
-                        .HasColumnType("varbinary(max)");
 
                     b.Property<string>("Phone")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("ProfilePictureURL")
+                    b.Property<string>("ProfileImageUrl")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Role")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -241,25 +146,9 @@ namespace Juntos_Backend.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserRole")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Juntos.Models.MembershipRef", b =>
-                {
-                    b.HasOne("Juntos.Models.Event", null)
-                        .WithMany("AllowedMembershipRefs")
-                        .HasForeignKey("EventId");
-                });
-
-            modelBuilder.Entity("Juntos.Models.Event", b =>
-                {
-                    b.Navigation("AllowedMembershipRefs");
                 });
 #pragma warning restore 612, 618
         }

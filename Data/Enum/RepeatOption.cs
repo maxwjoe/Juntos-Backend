@@ -1,10 +1,9 @@
 namespace Juntos.Data.Enum
 {
-    public enum RepeatOptions
+    public enum RepeatOption
     {
         Daily,
         Weekly,
-        Fortnightly,
         Monthly,
         Biannually,
         Annually

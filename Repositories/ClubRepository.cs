@@ -1,7 +1,6 @@
 using Juntos.Data;
 using Juntos.Interfaces;
 using Juntos.Models;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Juntos.Repositories
@@ -10,28 +9,26 @@ namespace Juntos.Repositories
     {
 
         private readonly DataContext _context;
-
         public ClubRepository(DataContext context)
         {
             _context = context;
         }
 
-
-        // Add : Adds a Club to the DB
-        public async Task<Club> Add(Club club)
+        public async Task<Club> Create(Club club)
         {
+            club.CreatedAt = DateTime.Now;
+            club.UpdatedAt = DateTime.Now;
+
             await _context.Clubs.AddAsync(club);
             await Save();
             return club;
+
         }
-
-        // Update : Updates a Club in the DB
-
         public async Task<Club> Update(Club club, ClubDto updates)
         {
             club.Title = updates.Title;
             club.Description = updates.Description;
-            club.ClubImageURL = updates.ClubImageURL;
+            club.ClubImageUrl = updates.ClubImageUrl;
             club.OwnerId = updates.OwnerId;
             club.UpdatedAt = DateTime.Now;
 
@@ -39,47 +36,38 @@ namespace Juntos.Repositories
             return club;
         }
 
-        // Delete : Deletes a Club from the DB
-
-        public async Task<Club> Delete(int Id)
+        public async Task<Club> Delete(int clubId)
         {
-            Club tgtClub = await _context.Clubs.FindAsync(Id);
+            Club clubToDelete = await GetByIdAsync(clubId);
 
-            if (tgtClub == null)
+            if (clubToDelete == null)
             {
                 return new Club();
             }
 
-            _context.Clubs.Remove(tgtClub);
+            _context.Clubs.Remove(clubToDelete);
             await Save();
-            return tgtClub;
+            return clubToDelete;
         }
-
-        // Save : Saves DB Changes
 
         public async Task<bool> Save()
         {
             var saved = await _context.SaveChangesAsync();
-            return saved > 0 ? true : false;
+            return saved > 0;
         }
 
-        // GetAll : Gets all clubs from DB    
-        public async Task<IEnumerable<Club>> GetAll()
+        public async Task<List<Club>> GetAll()
         {
             return await _context.Clubs.ToListAsync();
         }
 
-        // GetByIdAsync : Gets Club by ID
-        public async Task<Club> GetByIdAsync(int id)
+        public async Task<Club> GetByIdAsync(int clubId)
         {
-            return await _context.Clubs.FirstOrDefaultAsync(i => i.Id == id);
+            return await _context.Clubs.FindAsync(clubId);
         }
 
-        // GetByOwnerAsync : Gets Clubs from Owner Id
-        public async Task<Club> GetByOwnerAsync(int ownerId)
-        {
-            return await _context.Clubs.FirstOrDefaultAsync(i => i.OwnerId == ownerId);
-        }
+
+
 
     }
 }
