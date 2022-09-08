@@ -29,7 +29,6 @@ namespace Juntos.Repositories
             club.Title = updates.Title;
             club.Description = updates.Description;
             club.ClubImageUrl = updates.ClubImageUrl;
-            club.OwnerId = updates.OwnerId;
             club.UpdatedAt = DateTime.Now;
 
             await Save();

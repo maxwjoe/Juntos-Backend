@@ -15,7 +15,7 @@ namespace Juntos.Interfaces
 
         // --- QUERY METHODS ---
 
-        Task<List<Event>> GetAll(int userId);
+        Task<List<Event>> GetAll(int clubId);
         Task<Event> GetByIdAsync(int eventObjId);
 
 

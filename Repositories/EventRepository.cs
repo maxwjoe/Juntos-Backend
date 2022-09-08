@@ -29,7 +29,13 @@ namespace Juntos.Repositories
             eventObj.Title = updates.Title;
             eventObj.Description = updates.Description;
             eventObj.EventImageUrl = updates.EventImageUrl;
-            eventObj.OwnerId = updates.OwnerId;
+            eventObj.ClubId = updates.ClubId;
+            eventObj.CapacityLimit = updates.CapacityLimit;
+            eventObj.BookingTimeLimit = updates.BookingTimeLimit;
+            eventObj.RepeatOption = updates.RepeatOption;
+            eventObj.Location = updates.Location;
+            eventObj.AllowedMemberships = updates.AllowedMemberships;
+            eventObj.EventDateAndTime = updates.EventDateAndTime;
             eventObj.UpdatedAt = DateTime.Now;
 
             await Save();
@@ -54,9 +60,9 @@ namespace Juntos.Repositories
             return saved > 0;
         }
 
-        public async Task<List<Event>> GetAll(int userId)
+        public async Task<List<Event>> GetAll(int clubId)
         {
-            return await _context.Events.Where(i => i.OwnerId == userId).ToListAsync();
+            return await _context.Events.Where(i => i.ClubId == clubId).ToListAsync();
         }
 
         public async Task<Event> GetByIdAsync(int eventObjId)

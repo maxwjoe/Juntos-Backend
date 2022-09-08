@@ -81,16 +81,10 @@ namespace Juntos.Controllers
         public async Task<ActionResult<Club>> UpdatedExistingClub([FromBody] ClubDto updates, [FromRoute] int clubId)
         {
             Club existingClub = await _clubRepository.GetByIdAsync(clubId);
-            User reqUser = await _authService.GetUserObjFromToken();
 
-            if (existingClub == null || reqUser == null || updates == null)
+            if (existingClub == null || updates == null)
             {
                 return BadRequest("Invalid Params");
-            }
-
-            if (existingClub.OwnerId != reqUser.Id)
-            {
-                return Unauthorized("You do not own this club");
             }
 
             Club updatedClub = await _clubRepository.Update(existingClub, updates);
@@ -105,17 +99,11 @@ namespace Juntos.Controllers
         [Route("{clubId}")]
         public async Task<ActionResult<Club>> DeleteExistingClub([FromRoute] int clubId)
         {
-            User curUser = await _authService.GetUserObjFromToken();
             Club clubToDelete = await _clubRepository.GetByIdAsync(clubId);
 
-            if (curUser == null || clubToDelete == null)
+            if (clubToDelete == null)
             {
                 return BadRequest("Failed to delete club");
-            }
-
-            if (curUser.Id != clubToDelete.OwnerId)
-            {
-                return Unauthorized("You do not own this club");
             }
 
             Club deletedClub = await _clubRepository.Delete(clubToDelete);

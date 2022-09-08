@@ -1,4 +1,5 @@
 using System.Security.Claims;
+using Juntos.Helper;
 using Juntos.Interfaces;
 using Juntos.Models;
 using Microsoft.AspNetCore.Authorization;
@@ -13,10 +14,14 @@ namespace Juntos.Controllers
 
         private readonly IBookingRepository _bookingRepository;
         private readonly IAuthService _authService;
-        public BookingController(IBookingRepository bookingRepository, IAuthService authService)
+        private readonly IEventRepository _eventRepository;
+        private readonly GeneralHelper _helper;
+        public BookingController(IBookingRepository bookingRepository, IAuthService authService, IEventRepository eventRepository, GeneralHelper helper)
         {
             _bookingRepository = bookingRepository;
             _authService = authService;
+            _eventRepository = eventRepository;
+            _helper = helper;
         }
 
 
@@ -38,12 +43,28 @@ namespace Juntos.Controllers
 
         // CreateNewBooking : Creates a new booking in the database
         [HttpPost]
+        [Authorize]
         public async Task<ActionResult<Booking>> CreateNewBooking(BookingDto request)
         {
             if (request == null)
             {
                 return BadRequest("Invalid Booking");
             }
+
+            // Check the user has the correct membership
+            User user = await _authService.GetUserObjFromToken();
+            Event eventObj = await _eventRepository.GetByIdAsync(request.EventId);
+
+            if (user == null || eventObj == null)
+            {
+                return BadRequest("Failed to book");
+            }
+
+            if (!_helper.ValidateMembership(user.MembershipId, eventObj.AllowedMemberships))
+            {
+                return BadRequest("Invalid Membership");
+            }
+
 
             Booking newBooking = new Booking
             {

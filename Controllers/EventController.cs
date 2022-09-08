@@ -22,17 +22,11 @@ namespace Juntos.Controllers
         //TODO: Make this find relative to a club not a user
         // GetAllEvents : Gets all the eventObjs in the database belonging to user
         [HttpGet]
+        [Route("{clubId}")]
         [Authorize(Roles = "Admin")]
-        public async Task<ActionResult<List<Event>>> GetAllEvents()
+        public async Task<ActionResult<List<Event>>> GetAllEvents([FromRoute] int clubId)
         {
-            User reqUser = await _authService.GetUserObjFromToken();
-
-            if (reqUser == null)
-            {
-                return Unauthorized("You do not have the correct credentials");
-            }
-
-            var eventObjsDb = await _eventObjRepository.GetAll(reqUser.Id);
+            var eventObjsDb = await _eventObjRepository.GetAll(clubId);
 
             if (eventObjsDb == null)
             {
@@ -66,6 +60,13 @@ namespace Juntos.Controllers
                 Title = request.Title,
                 Description = request.Description,
                 EventImageUrl = request.EventImageUrl,
+                ClubId = request.ClubId,
+                CapacityLimit = request.CapacityLimit,
+                BookingTimeLimit = request.BookingTimeLimit,
+                RepeatOption = request.RepeatOption,
+                Location = request.Location,
+                AllowedMemberships = request.AllowedMemberships,
+                EventDateAndTime = request.EventDateAndTime
             };
 
             Event createdEvent = await _eventObjRepository.Create(newEvent);
@@ -81,16 +82,10 @@ namespace Juntos.Controllers
         public async Task<ActionResult<Event>> UpdatedExistingEvent([FromBody] EventDto updates, [FromRoute] int eventObjId)
         {
             Event existingEvent = await _eventObjRepository.GetByIdAsync(eventObjId);
-            User reqUser = await _authService.GetUserObjFromToken();
 
-            if (existingEvent == null || reqUser == null || updates == null)
+            if (existingEvent == null || updates == null)
             {
                 return BadRequest("Invalid Params");
-            }
-
-            if (existingEvent.OwnerId != reqUser.Id)
-            {
-                return Unauthorized("You do not own this eventObj");
             }
 
             Event updatedEvent = await _eventObjRepository.Update(existingEvent, updates);
@@ -105,24 +100,15 @@ namespace Juntos.Controllers
         [Route("{eventObjId}")]
         public async Task<ActionResult<Event>> DeleteExistingEvent([FromRoute] int eventObjId)
         {
-            User curUser = await _authService.GetUserObjFromToken();
             Event eventObjToDelete = await _eventObjRepository.GetByIdAsync(eventObjId);
 
-            if (curUser == null || eventObjToDelete == null)
+            if (eventObjToDelete == null)
             {
                 return BadRequest("Failed to delete eventObj");
-            }
-
-            if (curUser.Id != eventObjToDelete.OwnerId)
-            {
-                return Unauthorized("You do not own this eventObj");
             }
 
             Event deletedEvent = await _eventObjRepository.Delete(eventObjToDelete);
             return Ok(deletedEvent);
         }
-
-
-
     }
 }

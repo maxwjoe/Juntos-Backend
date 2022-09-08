@@ -1,4 +1,5 @@
 using Juntos.Data;
+using Juntos.Helper;
 using Juntos.Interfaces;
 using Juntos.Models;
 using Microsoft.EntityFrameworkCore;
@@ -9,9 +10,13 @@ namespace Juntos.Repositories
     {
 
         private readonly DataContext _context;
-        public BookingRepository(DataContext context)
+        private readonly IEventRepository _eventRepository;
+        private readonly IUserRepository _userRepository;
+        public BookingRepository(DataContext context, IEventRepository eventRepository, IUserRepository userRepository)
         {
             _context = context;
+            _eventRepository = eventRepository;
+            _userRepository = userRepository;
         }
 
         public async Task<Booking> Create(Booking booking)
@@ -22,7 +27,6 @@ namespace Juntos.Repositories
             await _context.Bookings.AddAsync(booking);
             await Save();
             return booking;
-
         }
 
         public async Task<Booking> Update(Booking booking, BookingDto updates)
