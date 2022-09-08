@@ -56,6 +56,14 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJw
     };
 });
 
+// Configure CORS
+builder.Services.AddCors(options => options.AddPolicy(name: "JuntosUI",
+    policy =>
+    {
+        policy.WithOrigins("*").AllowAnyMethod().AllowAnyHeader();
+    }
+));
+
 builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
@@ -67,6 +75,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseCors("JuntosUI");
 app.UseHttpsRedirection();
 
 app.UseAuthentication();
