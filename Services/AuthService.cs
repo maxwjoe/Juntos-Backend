@@ -132,13 +132,19 @@ namespace Juntos.Services
                 return new AuthResponseDto { Message = "Failed to register" };
             }
 
-            AuthResponseDto result = await Login(request);
+            LoginDto loginParams = new LoginDto
+            {
+                Email = request.Email,
+                Password = request.Password,
+            };
+
+            AuthResponseDto result = await Login(loginParams);
 
             return result;
         }
 
         // Login : Handles logging in
-        public async Task<AuthResponseDto> Login(UserDto request)
+        public async Task<AuthResponseDto> Login(LoginDto request)
         {
             User existingUser = await _userRepository.GetByEmailAsync(request.Email);
 

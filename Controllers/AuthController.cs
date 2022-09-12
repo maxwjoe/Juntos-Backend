@@ -54,7 +54,7 @@ namespace Juntos.Controllers
         // Login : Logs a user in
         [HttpPost]
         [Route("login")]
-        public async Task<ActionResult<AuthResponseDto>> Login(UserDto request)
+        public async Task<ActionResult<AuthResponseDto>> Login(LoginDto request)
         {
             if (request == null)
             {

@@ -11,6 +11,6 @@ namespace Juntos.Interfaces
         void CreatePasswordHash(string password, out byte[] passwordHash, out byte[] passwordSalt);
         bool VerifyPasswordHash(User user, string password);
         Task<AuthResponseDto> RegisterUser(UserDto request);
-        Task<AuthResponseDto> Login(UserDto request);
+        Task<AuthResponseDto> Login(LoginDto request);
     }
 }

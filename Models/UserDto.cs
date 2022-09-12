@@ -1,3 +1,6 @@
+using System.Runtime.InteropServices;
+using System.Runtime.Serialization;
+
 namespace Juntos.Models
 {
     public class UserDto
